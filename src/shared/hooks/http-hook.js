@@ -20,9 +20,14 @@ export const useHttpClient = () => {
           signal: httpAbortCtrl.signal
         });
 
-        const responseData = await response.json();
+        let responseData;
+        try {
+          responseData = await response.json();
+        } catch (jsonError) {
+          // Fallback in case response is not JSON (likely an HTML error page)
+          throw new Error('Invalid response from server.');
+        }
 
-        
         activeHttpRequests.current = activeHttpRequests.current.filter(
           reqCtrl => reqCtrl !== httpAbortCtrl
         );
